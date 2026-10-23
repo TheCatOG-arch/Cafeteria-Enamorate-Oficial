@@ -1,0 +1,275 @@
+<!-- admin/reclamos.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reclamos | Admin</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-logo"><i class="fa-solid fa-mug-hot"></i> Enamorate</div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+            <a href="pedidos.html"><i class="fa-solid fa-receipt"></i> Pedidos</a>
+            <a href="productos.html"><i class="fa-solid fa-box"></i> Productos</a>
+            <a href="reclamos.html" class="active"><i class="fa-solid fa-triangle-exclamation"></i> Reclamos</a>
+            <a href="reportes.html"><i class="fa-solid fa-file-excel"></i> Reportes</a>
+        </nav>
+        <div style="margin-top: auto; padding: 20px;">
+            <button onclick="logout()" class="btn-logout" style="width: 100%;"><i class="fa-solid fa-power-off"></i> Salir</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="top-header">
+            <h1>Gestión de Reclamos</h1>
+        </div>
+
+        <!-- PESTAÑAS (TABS) -->
+        <div class="controls-bar" style="margin-bottom: 20px;">
+            <div class="filtros-categorias">
+                <button class="filtro-btn active" onclick="cambiarPestaña('pendientes', this)" id="tab-pendientes">
+                    <i class="fa-solid fa-clock"></i> Pendientes
+                </button>
+                <button class="filtro-btn" onclick="cambiarPestaña('atendidos', this)" id="tab-atendidos">
+                    <i class="fa-solid fa-check-circle"></i> Reclamos Atendidos
+                </button>
+            </div>
+            
+            <!-- BOTONES DE ACCIÓN MASIVA (Solo visible en Atendidos) -->
+            <div id="acciones-masivas" style="display: none; gap: 10px;">
+                <button class="btn-secondary" onclick="eliminarSeleccionados()" style="color: #d13438; border-color: #d13438;"><i class="fa-solid fa-trash"></i> Eliminar Seleccionados</button>
+                <button class="btn-primary" onclick="vaciarAtendidos()" style="background: #d13438; border-color: #d13438;"><i class="fa-solid fa-broom"></i> Vaciar Todo</button>
+            </div>
+        </div>
+
+        <!-- TABLA PENDIENTES -->
+        <div id="tabla-pendientes-container" class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Cliente</th>
+                        <th>Documento</th>
+                        <th>Tipo</th>
+                        <th>Motivo / Detalle</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-pendientes"></tbody>
+            </table>
+        </div>
+
+        <!-- TABLA ATENDIDOS -->
+        <div id="tabla-atendidos-container" class="table-container" style="display: none;">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 40px;"><input type="checkbox" id="check-todos" onchange="seleccionarTodos(this)"></th>
+                        <th>Fecha</th>
+                        <th>Cliente</th>
+                        <th>Tipo</th>
+                        <th>Motivo / Detalle</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-atendidos"></tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- MODAL PARA VER DETALLE COMPLETO -->
+    <div class="modal" id="modal-detalle">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Detalle del Reclamo</h2>
+                <button type="button" class="close-modal" onclick="cerrarDetalle()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="detalle-contenido" style="padding: 10px 0; line-height: 1.6; color: var(--text-main);"></div>
+            <button class="btn-primary" onclick="cerrarDetalle()" style="width: 100%; margin-top: 20px;">Cerrar</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        checkSession();
+        let reclamosPendientes = [];
+        let reclamosAtendidos = [];
+
+        // CARGAR RECLAMOS
+        async function cargarReclamos() {
+            const { data, error } = await supabaseClient.from('reclamos').select('*').order('created_at', { ascending: false });
+            
+            if (error) {
+                console.error("Error al cargar:", error);
+                return;
+            }
+
+            reclamosPendientes = data.filter(r => r.estado === 'pendiente');
+            reclamosAtendidos = data.filter(r => r.estado === 'resuelto');
+
+            renderizarPendientes();
+            renderizarAtendidos();
+        }
+
+        // RENDERIZAR TABLA PENDIENTES
+        function renderizarPendientes() {
+            const tbody = document.getElementById('tabla-pendientes');
+            tbody.innerHTML = '';
+            if (reclamosPendientes.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px;">No hay reclamos pendientes. ¡Buen trabajo!</td></tr>';
+                return;
+            }
+            reclamosPendientes.forEach(r => {
+                const fecha = new Date(r.created_at).toLocaleDateString('es-PE');
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${fecha}</td>
+                        <td>${r.nombre_cliente}</td>
+                        <td>${r.documento}</td>
+                        <td><span class="badge ${r.tipo === 'queja' ? 'badge-warning' : 'badge-danger'}">${r.tipo.toUpperCase()}</span></td>
+                        <td>
+                            <button class="btn-secondary" onclick="verDetalle('${r.id}')" style="padding: 5px 10px; font-size: 0.8rem;">
+                                <i class="fa-solid fa-eye"></i> Ver Motivo
+                            </button>
+                        </td>
+                        <td>
+                            <button class="btn-primary" onclick="cambiarEstado('${r.id}', 'resuelto')" style="padding: 5px 10px; font-size: 0.8rem; background: var(--success);">
+                                <i class="fa-solid fa-check"></i> Resolver
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // RENDERIZAR TABLA ATENDIDOS
+        function renderizarAtendidos() {
+            const tbody = document.getElementById('tabla-atendidos');
+            tbody.innerHTML = '';
+            document.getElementById('check-todos').checked = false;
+            if (reclamosAtendidos.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px;">Aún no hay reclamos atendidos.</td></tr>';
+                return;
+            }
+            reclamosAtendidos.forEach(r => {
+                const fecha = new Date(r.created_at).toLocaleDateString('es-PE');
+                tbody.innerHTML += `
+                    <tr>
+                        <td><input type="checkbox" class="check-item" value="${r.id}"></td>
+                        <td>${fecha}</td>
+                        <td>${r.nombre_cliente}</td>
+                        <td><span class="badge ${r.tipo === 'queja' ? 'badge-warning' : 'badge-danger'}">${r.tipo.toUpperCase()}</span></td>
+                        <td>
+                            <button class="btn-secondary" onclick="verDetalle('${r.id}')" style="padding: 5px 10px; font-size: 0.8rem;">
+                                <i class="fa-solid fa-eye"></i> Ver Motivo
+                            </button>
+                        </td>
+                        <td>
+                            <div style="display: flex; gap: 5px;">
+                                <!-- BOTÓN DE REVERTIR A PENDIENTE -->
+                                <button class="btn-secondary" onclick="cambiarEstado('${r.id}', 'pendiente')" style="padding: 5px 10px; font-size: 0.8rem; color: #8a6d00; border-color: #8a6d00;" title="Devolver a Pendientes">
+                                    <i class="fa-solid fa-rotate-left"></i> Pendiente
+                                </button>
+                                <button class="btn-danger" onclick="eliminarReclamo('${r.id}')" style="padding: 5px 10px; font-size: 0.8rem;">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // LÓGICA DE PESTAÑAS
+        function cambiarPestaña(pestaña, boton) {
+            document.querySelectorAll('.filtro-btn').forEach(btn => btn.classList.remove('active'));
+            boton.classList.add('active');
+
+            const divPendientes = document.getElementById('tabla-pendientes-container');
+            const divAtendidos = document.getElementById('tabla-atendidos-container');
+            const accionesMasivas = document.getElementById('acciones-masivas');
+
+            if (pestaña === 'pendientes') {
+                divPendientes.style.display = 'block';
+                divAtendidos.style.display = 'none';
+                accionesMasivas.style.display = 'none';
+            } else {
+                divPendientes.style.display = 'none';
+                divAtendidos.style.display = 'block';
+                accionesMasivas.style.display = 'flex';
+            }
+        }
+
+        // VER DETALLE DEL RECLAMO (CORREGIDO)
+        function verDetalle(id) {
+            // Convertimos ambos IDs a String para evitar el error de comparación
+            const reclamo = reclamosPendientes.find(r => String(r.id) === String(id)) || reclamosAtendidos.find(r => String(r.id) === String(id));
+            
+            if (!reclamo) {
+                alert("No se pudo encontrar el detalle de este reclamo.");
+                return;
+            }
+
+            const fecha = new Date(reclamo.created_at).toLocaleString('es-PE');
+            
+            document.getElementById('detalle-contenido').innerHTML = `
+                <p><strong>Cliente:</strong> ${reclamo.nombre_cliente}</p>
+                <p><strong>Correo:</strong> ${reclamo.correo || 'No proporcionado'}</p>
+                <p><strong>DNI/RUC:</strong> ${reclamo.documento}</p>
+                <p><strong>Fecha:</strong> ${fecha}</p>
+                <p><strong>Tipo:</strong> ${reclamo.tipo.toUpperCase()}</p>
+                <hr style="margin: 15px 0; border: none; border-top: 1px solid var(--border);">
+                <p><strong>Motivo / Detalle:</strong></p>
+                <p style="background: rgba(0,0,0,0.05); padding: 15px; border-radius: 8px; margin-top: 10px;">${reclamo.detalle}</p>
+            `;
+            document.getElementById('modal-detalle').classList.add('open');
+        }
+
+        function cerrarDetalle() { document.getElementById('modal-detalle').classList.remove('open'); }
+
+        // ACCIONES
+        async function cambiarEstado(id, nuevoEstado) {
+            await supabaseClient.from('reclamos').update({ estado: nuevoEstado }).eq('id', id);
+            cargarReclamos();
+        }
+
+        async function eliminarReclamo(id) {
+            if(confirm('¿Seguro que deseas eliminar este reclamo permanentemente?')) {
+                await supabaseClient.from('reclamos').delete().eq('id', id);
+                cargarReclamos();
+            }
+        }
+
+        // SELECCIÓN MÚLTIPLE
+        function seleccionarTodos(check) {
+            document.querySelectorAll('.check-item').forEach(item => item.checked = check.checked);
+        }
+
+        async function eliminarSeleccionados() {
+            const seleccionados = Array.from(document.querySelectorAll('.check-item:checked')).map(item => item.value);
+            if (seleccionados.length === 0) {
+                alert("No has seleccionado ningún reclamo.");
+                return;
+            }
+            if(confirm(`¿Eliminar ${seleccionados.length} reclamos seleccionados?`)) {
+                await supabaseClient.from('reclamos').delete().in('id', seleccionados);
+                cargarReclamos();
+            }
+        }
+
+        async function vaciarAtendidos() {
+            if(confirm('¿Estás seguro de que deseas borrar TODOS los reclamos atendidos? Esta acción no se puede deshacer.')) {
+                await supabaseClient.from('reclamos').delete().eq('estado', 'resuelto');
+                cargarReclamos();
+            }
+        }
+
+        window.onload = cargarReclamos;
+    </script>
+</body>
+</html>

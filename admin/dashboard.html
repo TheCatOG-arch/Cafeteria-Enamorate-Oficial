@@ -1,0 +1,98 @@
+<!-- admin/dashboard.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard | Admin</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* ESTILO PARA EL INTERRUPTOR (SWITCH) */
+        .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--success); }
+        input:checked + .slider:before { transform: translateX(22px); }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-logo"><i class="fa-solid fa-mug-hot"></i> Enamorate</div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="active"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+            <a href="pedidos.html"><i class="fa-solid fa-receipt"></i> Pedidos</a>
+            <a href="productos.html"><i class="fa-solid fa-box"></i> Productos</a>
+            <a href="reclamos.html"><i class="fa-solid fa-triangle-exclamation"></i> Reclamos</a>
+            <a href="reportes.html"><i class="fa-solid fa-file-excel"></i> Reportes</a>
+        </nav>
+        <div style="margin-top: auto; padding: 20px;">
+            <button onclick="logout()" class="btn-logout" style="width: 100%;"><i class="fa-solid fa-power-off"></i> Salir</button>
+        </div>
+    </aside>
+    
+    <main class="main-content">
+        <div class="top-header">
+            <h1>Resumen General</h1>
+            
+            <!-- INTERRUPTOR DE TIENDA -->
+            <div style="display: flex; align-items: center; gap: 15px; background: var(--surface); padding: 10px 20px; border-radius: 12px; border: 1px solid var(--border);">
+                <div>
+                    <h3 style="font-size: 0.9rem; margin-bottom: 2px;">Estado de la Tienda</h3>
+                    <p id="status-text" style="color: var(--success); font-size: 0.8rem; font-weight: bold;">Abierta</p>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="toggle-tienda" checked onchange="toggleTienda(this)">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fa-solid fa-money-bill-wave"></i></div>
+                <div class="stat-info"><h3>Ingresos (Total)</h3><p id="stat-ingresos">S/ 0.00</p></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fa-solid fa-bag-shopping"></i></div>
+                <div class="stat-info"><h3>Pedidos Pagados</h3><p id="stat-pedidos">0</p></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fa-solid fa-chart-line"></i></div>
+                <div class="stat-info"><h3>Ticket Promedio</h3><p id="stat-ticket">S/ 0.00</p></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <div class="stat-info"><h3>Reclamos</h3><p id="stat-reclamos">0</p></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fa-solid fa-utensils"></i></div>
+                <div class="stat-info"><h3>Productos Activos</h3><p id="stat-productos">0</p></div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h3>Ingresos de los Últimos 7 Días</h3>
+            <div class="chart-wrapper">
+                <canvas id="graficoVentas"></canvas>
+            </div>
+        </div>
+
+        <div class="table-container" style="margin-top: 30px;">
+            <div style="padding: 20px; border-bottom: 1px solid var(--border);">
+                <h3 style="color: var(--text-main); font-size: 1.2rem;">Últimos Pedidos</h3>
+            </div>
+            <table>
+                <thead><tr><th>Cliente</th><th>Monto</th><th>Método</th><th>Estado</th><th>Fecha</th></tr></thead>
+                <tbody id="tabla-ultimos-pedidos"></tbody>
+            </table>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

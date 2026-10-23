@@ -1,0 +1,44 @@
+<!-- admin/index.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Login | Admin Café Enamorate</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <i class="fa-solid fa-mug-hot" style="font-size: 3rem; color: var(--primary); margin-bottom: 20px;"></i>
+            <h2>Admin Panel</h2>
+            <form id="login-form">
+                <div class="form-group"><input type="email" id="email" placeholder="Correo Electrónico" required></div>
+                <div class="form-group"><input type="password" id="password" placeholder="Contraseña" required></div>
+                <button type="submit" class="btn-primary" style="width:100%;" id="btn-login">Iniciar Sesión</button>
+                <p id="error-msg" style="color: var(--danger); margin-top: 15px; font-size: 0.9rem; display: none;"></p>
+            </form>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btn-login');
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            btn.innerHTML = 'Verificando...'; btn.disabled = true;
+            const result = await login(email, password);
+            if (result.success) {
+                window.location.href = 'dashboard.html';
+            } else {
+                document.getElementById('error-msg').innerText = "Error: " + result.message;
+                document.getElementById('error-msg').style.display = 'block';
+                btn.innerHTML = 'Iniciar Sesión'; btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

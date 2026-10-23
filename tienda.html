@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tienda | Café Enamorate</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+
+    <header class="navbar-container">
+        <nav class="navbar">
+            <a href="index.html" class="logo">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="logo-icon">
+                    <path d="M4 17H18V19H4V17Z" fill="#E6A85C"/>
+                    <path d="M5 15V10C5 8.89543 5.89543 8 7 8H15C16.1046 8 17 8.89543 17 10V15H5Z" stroke="#E6A85C" stroke-width="2"/>
+                    <path d="M17 11H18C19.1046 11 20 11.8954 20 13V13C20 14.1046 19.1046 15 18 15H17" stroke="#E6A85C" stroke-width="2"/>
+                    <path d="M8 5C8 3.89543 8.89543 3 10 3C11.1046 3 12 3.89543 12 5" stroke="#E6A85C" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M12 4C12 2.89543 12.8954 2 14 2C15.1046 2 16 2.89543 16 4" stroke="#E6A85C" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Café Enamorate
+            </a>
+            <div class="nav-links">
+                <a href="index.html">Inicio</a>
+                <a href="tienda.html" class="active">Carta / Tienda</a>
+                <a href="nosotros.html">Nosotros</a>
+            </div>
+            <button class="cart-btn" onclick="toggleCart()">
+                <i class="fa-solid fa-bag-shopping"></i>
+                <span class="cart-badge" id="cart-count">0</span>
+            </button>
+        </nav>
+    </header>
+
+    <section class="tienda-header reveal">
+        <h1>Nuestra Carta</h1>
+        <p>Elige tus platos favoritos y agrégalos al carrito.</p>
+    </section>
+
+    <div class="filtros-container reveal">
+        <button class="filtro-btn active" onclick="filtrarProductos('todos', this)"><i class="fa-solid fa-border-all"></i> Todos</button>
+        <button class="filtro-btn" onclick="filtrarProductos('piqueos', this)"><i class="fa-solid fa-drumstick-bite"></i> Piqueos</button>
+        <button class="filtro-btn" onclick="filtrarProductos('platos', this)"><i class="fa-solid fa-utensils"></i> Platos</button>
+        <button class="filtro-btn" onclick="filtrarProductos('cocteles', this)"><i class="fa-solid fa-martini-glass-citrus"></i> Cócteles</button>
+        <button class="filtro-btn" onclick="filtrarProductos('cafes', this)"><i class="fa-solid fa-mug-hot"></i> Cafés</button>
+        <button class="filtro-btn" onclick="filtrarProductos('refrescos', this)"><i class="fa-solid fa-blender"></i> Refrescos</button>
+        <button class="filtro-btn" onclick="filtrarProductos('postres', this)"><i class="fa-solid fa-cake-candles"></i> Postres</button>
+    </div>
+
+    <section class="destacados" style="padding-top: 0;">
+        <div class="grid-productos" id="todos-los-productos"></div>
+    </section>
+
+    <!-- INFO Y FAQ -->
+    <section class="info-pedido-section">
+        <div class="info-pedido-grid">
+            <div class="info-card reveal">
+                <h3><i class="fa-solid fa-circle-info"></i> Información de Pedido</h3>
+                <ul>
+                    <li><i class="fa-solid fa-clock"></i> <strong>Horario:</strong> Lunes a Domingo de 4:00 PM a 1:00 AM.</li>
+                    <li><i class="fa-solid fa-motorcycle"></i> <strong>Delivery:</strong> Zona urbana de Pichanaki (Costo S/ 5.00).</li>
+                    <li><i class="fa-solid fa-money-bill-wave"></i> <strong>Pagos:</strong> Yape, Plin, Tarjeta o Efectivo.</li>
+                    <li><i class="fa-solid fa-bag-shopping"></i> <strong>Recojo:</strong> Listo en 15-20 min en Jr. Primero de Mayo 1067.</li>
+                </ul>
+            </div>
+            <div class="faq-card reveal">
+                <h3><i class="fa-solid fa-circle-question"></i> Preguntas Frecuentes</h3>
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFaq(this)">¿Hacen envíos a domicilio? <i class="fa-solid fa-chevron-down"></i></button>
+                    <div class="faq-answer"><p>Sí, hacemos delivery en toda la zona urbana de Pichanaki por un costo adicional de S/ 5.00.</p></div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFaq(this)">¿Puedo pagar con tarjeta? <i class="fa-solid fa-chevron-down"></i></button>
+                    <div class="faq-answer"><p>Sí, aceptamos tarjetas de débito y crédito. También Yape, Plin y efectivo.</p></div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFaq(this)">¿Tienen opciones vegetarianas? <i class="fa-solid fa-chevron-down"></i></button>
+                    <div class="faq-answer"><p>Contamos con ensaladas y algunos platos que se pueden adaptar. Consulta con nuestro personal.</p></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-content reveal">
+            <div>
+                <h3 class="logo">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 17H18V19H4V17Z" fill="#E6A85C"/>
+                        <path d="M5 15V10C5 8.89543 5.89543 8 7 8H15C16.1046 8 17 8.89543 17 10V15H5Z" stroke="#E6A85C" stroke-width="2"/>
+                        <path d="M17 11H18C19.1046 11 20 11.8954 20 13V13C20 14.1046 19.1046 15 18 15H17" stroke="#E6A85C" stroke-width="2"/>
+                    </svg>
+                    Café Enamorate
+                </h3>
+                <p>El rincón perfecto en Pichanaki para disfrutar de un buen café y compartir piqueos.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fa-brands fa-facebook"></i></a>
+                    <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#"><i class="fa-brands fa-tiktok"></i></a>
+                </div>
+            </div>
+            <div>
+                <h4>Enlaces Rápidos</h4>
+                <p><a href="index.html" style="color: var(--text-muted); text-decoration: none;">Inicio</a></p>
+                <p><a href="nosotros.html" style="color: var(--text-muted); text-decoration: none;">Sobre Nosotros</a></p>
+                <p><a href="#" onclick="abrirReclamaciones()" style="color: var(--text-muted); text-decoration: none;">Libro de Reclamaciones</a></p>
+            </div>
+            <div>
+                <h4>Contacto</h4>
+                <p><i class="fa-solid fa-location-dot"></i> Jr. Primero de Mayo 1067, Pichanaki</p>
+                <p><i class="fa-solid fa-phone"></i> +51 969 954 687</p>
+                <p><i class="fa-solid fa-envelope"></i> hola@cafeenamorate.com</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Café Enamorate. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <a href="https://wa.me/51969054687" target="_blank" class="whatsapp-float"><i class="fa-brands fa-whatsapp"></i></a>
+    <div id="toast" class="toast"><i class="fa-solid fa-check-circle"></i> Agregado al carrito</div>
+
+    <!-- CARRITO -->
+    <div class="cart-drawer" id="cart-drawer">
+        <div class="cart-header"><h2>Tu Pedido</h2><button onclick="toggleCart()"><i class="fa-solid fa-xmark"></i></button></div>
+        <div class="cart-items" id="cart-items"></div>
+        <div class="cart-footer" id="cart-footer">
+            <div class="cart-total"><span>Total</span><span id="cart-total-price">S/ 0.00</span></div>
+            <button class="btn-primary" style="width: 100%;" onclick="abrirCheckout()">Proceder al Pago</button>
+        </div>
+    </div>
+    <div class="overlay" id="overlay" onclick="toggleCart()"></div>
+
+    <!-- CHECKOUT -->
+    <div class="modal-checkout" id="modal-checkout">
+        <div class="modal-content">
+            <div class="modal-header"><h2>Finalizar Pedido</h2><button onclick="cerrarCheckout()"><i class="fa-solid fa-xmark"></i></button></div>
+            <form onsubmit="procesarPago(event)">
+                <div class="form-group"><label>Nombre Completo</label><input type="text" required placeholder="Ej. Juan Pérez"></div>
+                <div class="form-group"><label>WhatsApp / Teléfono</label><input type="tel" required placeholder="Ej. 999 999 999"></div>
+                <div class="form-group">
+                    <label>Tipo de Entrega</label>
+                    <div class="delivery-options">
+                        <label class="delivery-card active"><input type="radio" name="entrega" value="delivery" checked onchange="toggleDireccion()"><i class="fa-solid fa-motorcycle"></i> Delivery (+ S/ 5.00)</label>
+                        <label class="delivery-card"><input type="radio" name="entrega" value="recojo" onchange="toggleDireccion()"><i class="fa-solid fa-store"></i> Recojo en tienda</label>
+                    </div>
+                </div>
+                <div class="form-group" id="direccion-group"><label>Dirección de entrega</label><input type="text" id="direccion" required placeholder="Ej. Jr. Primero de Mayo 1067"></div>
+                <div class="form-group">
+                    <label>Método de Pago</label>
+                    <div class="payment-options">
+                        <label class="payment-card active"><input type="radio" name="pago" value="yape" checked onchange="togglePaymentFields()"><i class="fa-solid fa-qrcode"></i> Yape / Plin</label>
+                        <label class="payment-card"><input type="radio" name="pago" value="tarjeta" onchange="togglePaymentFields()"><i class="fa-solid fa-credit-card"></i> Tarjeta</label>
+                        <label class="payment-card"><input type="radio" name="pago" value="efectivo" onchange="togglePaymentFields()"><i class="fa-solid fa-money-bill-wave"></i> Efectivo</label>
+                    </div>
+                </div>
+                <div id="yape-details" class="payment-details">
+                    <div class="qr-container">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=969054687" alt="QR Yape">
+                        <p>Escanea el QR o envía al número:</p>
+                        <h4><i class="fa-solid fa-mobile-screen"></i> 969 054 687</h4>
+                    </div>
+                </div>
+                <div id="tarjeta-details" class="payment-details" style="display: none;">
+                    <div class="card-inputs-grid">
+                        <div class="form-group"><label>Número de Tarjeta</label><input type="text" placeholder="0000 0000 0000 0000" maxlength="19"></div>
+                        <div class="form-group"><label>Vencimiento</label><input type="text" placeholder="MM/AA" maxlength="5"></div>
+                        <div class="form-group"><label>CVV</label><input type="password" placeholder="***" maxlength="3"></div>
+                    </div>
+                </div>
+                <div id="efectivo-details" class="payment-details" style="display: none;">
+                    <div class="form-group"><label>DNI (Para la boleta)</label><input type="text" id="dni" placeholder="Ej. 12345678" maxlength="8"></div>
+                </div>
+                <button type="submit" class="btn-primary" style="width: 100%; margin-top: 20px;">Enviar Pedido por WhatsApp</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL LIBRO DE RECLAMACIONES -->
+    <div class="modal-checkout" id="modal-reclamaciones">
+        <div class="modal-content">
+            <div class="modal-header"><h2>Libro de Reclamaciones</h2><button onclick="cerrarReclamaciones()"><i class="fa-solid fa-xmark"></i></button></div>
+            <form onsubmit="enviarReclamacion(event)">
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px;">Conforme a la Ley N° 29571, este establecimiento cuenta con un Libro de Reclamaciones virtual.</p>
+                <div class="form-group"><label>Nombre Completo</label><input type="text" required placeholder="Ej. Juan Pérez"></div>
+                <div class="form-group"><label>DNI / RUC</label><input type="text" required placeholder="Ej. 12345678"></div>
+                <div class="form-group"><label>Correo Electrónico</label><input type="email" required placeholder="ejemplo@correo.com"></div>
+                <div class="form-group"><label>Tipo de Reclamo</label>
+                    <select class="select-opcion">
+                        <option>Reclamo (Producto o servicio)</option>
+                        <option>Queja (Atención)</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Detalle de la queja/reclamo</label><textarea rows="4" placeholder="Escribe aquí tu detalle..." style="width:100%; padding:10px; border-radius:8px; background:var(--bg); color:var(--text-main); border:1px solid rgba(166,154,144,0.3);"></textarea></div>
+                <button type="submit" class="btn-primary" style="width: 100%; margin-top: 10px;">Enviar Reclamo</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

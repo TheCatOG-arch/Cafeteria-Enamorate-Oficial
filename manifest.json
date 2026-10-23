@@ -1,0 +1,18 @@
+{
+  "name": "Café Enamórate Pichanaki",
+  "short_name": "Enamórate",
+  "description": "Pide tus cafés, piqueos y postres favoritos en Pichanaki.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#09090b",
+  "theme_color": "#e11d48",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "images/cafe.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

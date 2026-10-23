@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="es" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Café Enamórate | Pichanaki - Specialty Coffee & Restobar Web App</title>
+  <meta name="description" content="Disfruta de los mejores cafés, piqueos y cócteles en Pichanaki. Pide online, delivery o recojo en tienda.">
+  
+  <!-- FAVICON -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>☕</text></svg>">
+
+  <!-- SEO REDES -->
+  <meta property="og:title" content="Café Enamorate | Pichanaki">
+  <meta property="og:description" content="El rincón perfecto para compartir. Pide online y recoge en tienda.">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=1000&auto=format&fit=crop">
+
+  <!-- ================= CONFIGURACIÓN PWA ================= -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#e11d48">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <!-- ===================================================== -->
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            display: ['"Syne"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              pink: '#e11d48',
+              amber: '#f59e0b',
+              dark: '#09090b',
+              card: '#121215',
+              cardHover: '#18181c'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body { background-color: #09090b; color: #f4f4f5; overflow-x: hidden; }
+    .hero-glow { background: radial-gradient(circle at 75% 50%, rgba(225, 29, 72, 0.25) 0%, rgba(245, 158, 11, 0.14) 35%, rgba(18, 18, 21, 0) 70%); }
+    .card-glow:hover { box-shadow: 0 14px 35px -10px rgba(225, 29, 72, 0.28); }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .animate-slide-up { animation: slideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+  </style>
+</head>
+<body class="antialiased selection:bg-brand-pink selection:text-white pb-28">
+
+  <div id="toastContainer" class="fixed top-24 right-5 z-[70] flex flex-col gap-2.5 pointer-events-none"></div>
+
+  <!-- PROMO BAR -->
+  <div class="bg-gradient-to-r from-brand-pink via-rose-600 to-amber-500 text-white text-[11px] sm:text-xs font-bold py-2 px-4 text-center flex items-center justify-center gap-2">
+    <span class="bg-black/30 px-2 py-0.5 rounded-full uppercase tracking-wider text-[10px]">Promo Web</span>
+    <span>Usa el código <strong>ENAMORATE10</strong> en tu carrito y obtén 10% OFF</span>
+  </div>
+
+  <!-- HEADER -->
+  <header class="sticky top-0 z-40 backdrop-blur-xl bg-[#09090b]/85 border-b border-white/[0.08]">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 h-20 flex items-center justify-between gap-3">
+      
+      <a href="#" class="flex items-center gap-2 text-lg sm:text-xl font-extrabold tracking-wider shrink-0">
+        <span class="font-display text-white">CAFÉ</span>
+        <span class="bg-gradient-to-r from-brand-pink to-orange-500 text-white px-2 py-0.5 rounded-md text-sm flex items-center gap-1 shadow-lg shadow-brand-pink/30"><i data-lucide="heart" class="w-3.5 h-3.5 fill-current"></i></span>
+        <span class="font-display text-white">ENAMÓRATE</span>
+      </a>
+
+      <div class="hidden md:flex items-center flex-1 max-w-md mx-4 bg-[#f4f4f5] text-zinc-900 rounded-full px-4 py-2 shadow-inner focus-within:ring-2 focus-within:ring-brand-pink">
+        <i data-lucide="search" class="w-4 h-4 text-zinc-500 mr-2.5 shrink-0"></i>
+        <input id="searchInput" type="text" placeholder="Buscar frappuccinos, waffles, cafés..." class="bg-transparent w-full text-sm font-medium placeholder-zinc-500 focus:outline-none" />
+        <span class="text-[11px] font-bold bg-zinc-900 text-white px-2.5 py-1 rounded-full shrink-0">Pichanaki</span>
+      </div>
+
+      <div class="flex items-center gap-2 sm:gap-3">
+        <div id="estado-tienda-header" class="hidden xl:flex items-center gap-2 text-xs font-semibold text-zinc-300 bg-white/[0.04] px-3.5 py-2 rounded-full border border-white/[0.08]">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>Abierto • Pichanaki</span>
+        </div>
+
+        <button onclick="toggleReservationModal()" class="hidden sm:flex items-center gap-1.5 text-xs font-bold text-amber-400 hover:text-black hover:bg-amber-400 bg-amber-400/10 px-3.5 py-2 rounded-full border border-amber-400/30 transition">
+          <i data-lucide="calendar-heart" class="w-3.5 h-3.5"></i> <span>Reservar</span>
+        </button>
+
+        <button onclick="filterFavorites()" class="relative w-10 h-10 rounded-full bg-white/[0.05] hover:bg-white/[0.12] border border-white/[0.08] flex items-center justify-center text-zinc-200 transition">
+          <i data-lucide="heart" class="w-4 h-4 text-brand-pink"></i>
+          <span id="favCountBadge" class="absolute -top-1 -right-1 bg-white text-black text-[10px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center">0</span>
+        </button>
+
+        <button onclick="toggleCart()" class="relative flex items-center gap-2 bg-brand-pink hover:bg-rose-600 text-white text-xs sm:text-sm font-bold px-4 py-2.5 rounded-full transition shadow-lg shadow-brand-pink/25">
+          <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+          <span id="headerCartTotal">S/ 0.00</span>
+          <span id="headerCartCount" class="bg-white text-brand-pink text-[11px] font-extrabold w-5 h-5 rounded-full flex items-center justify-center">0</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="md:hidden px-4 pb-3">
+      <div class="flex items-center bg-[#f4f4f5] text-zinc-900 rounded-full px-4 py-2">
+        <i data-lucide="search" class="w-4 h-4 text-zinc-500 mr-2 shrink-0"></i>
+        <input id="mobileSearchInput" type="text" placeholder="Buscar en la carta..." class="bg-transparent w-full text-xs font-medium placeholder-zinc-500 focus:outline-none" />
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-[1400px] mx-auto px-4 sm:px-6 pt-6 space-y-12">
+    <!-- HERO SLIDER -->
+    <section class="relative rounded-[28px] bg-[#121215] border border-white/[0.08] overflow-hidden hero-glow min-h-[430px] sm:min-h-[480px] flex items-center">
+      <button onclick="prevSlide()" class="absolute left-3 sm:left-5 z-20 w-10 h-10 rounded-full bg-black/60 hover:bg-white hover:text-black border border-white/10 flex items-center justify-center text-white transition backdrop-blur-md"><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
+      <div id="heroSlideContent" class="w-full grid grid-cols-1 lg:grid-cols-12 items-center px-8 sm:px-16 py-10 gap-8 transition-all duration-500"></div>
+      <button onclick="nextSlide()" class="absolute right-3 sm:right-5 z-20 w-10 h-10 rounded-full bg-black/60 hover:bg-white hover:text-black border border-white/10 flex items-center justify-center text-white transition backdrop-blur-md"><i data-lucide="chevron-right" class="w-5 h-5"></i></button>
+      <div id="heroDots" class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20"></div>
+    </section>
+
+    <!-- BENEFICIOS -->
+    <section class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <div class="bg-[#121215] border border-white/[0.07] rounded-2xl p-4 flex items-center justify-center gap-3 hover:border-white/20 transition"><i data-lucide="coffee" class="w-5 h-5 text-amber-400"></i><span class="text-xs sm:text-sm font-bold uppercase text-zinc-200">Café 100% Selva</span></div>
+      <div class="bg-[#121215] border border-white/[0.07] rounded-2xl p-4 flex items-center justify-center gap-3 hover:border-white/20 transition"><i data-lucide="sliders-horizontal" class="w-5 h-5 text-brand-pink"></i><span class="text-xs sm:text-sm font-bold uppercase text-zinc-200">Personaliza Toppings</span></div>
+      <div class="bg-[#121215] border border-white/[0.07] rounded-2xl p-4 flex items-center justify-center gap-3 hover:border-white/20 transition"><i data-lucide="bike" class="w-5 h-5 text-emerald-400"></i><span class="text-xs sm:text-sm font-bold uppercase text-zinc-200">Delivery Express</span></div>
+      <div class="bg-[#121215] border border-white/[0.07] rounded-2xl p-4 flex items-center justify-center gap-3 hover:border-white/20 transition"><i data-lucide="qr-code" class="w-5 h-5 text-purple-400"></i><span class="text-xs sm:text-sm font-bold uppercase text-zinc-200">Yape y Plin</span></div>
+    </section>
+
+    <!-- LO MAS PEDIDO -->
+    <section id="populares" class="space-y-6">
+      <div class="flex items-end justify-between">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-widest text-brand-pink">Favoritos en Pichanaki</span>
+          <h2 class="text-2xl sm:text-4xl font-extrabold font-display tracking-tight mt-1">LO MÁS PEDIDO</h2>
+        </div>
+        <a href="#catalogo-completo" class="text-xs sm:text-sm font-semibold text-zinc-400 hover:text-white flex items-center gap-1">Ver toda la carta <i data-lucide="arrow-up-right" class="w-4 h-4"></i></a>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <div class="lg:col-span-5 bg-[#121215] border border-white/[0.08] rounded-[26px] p-4 flex flex-col justify-between group hover:border-white/20 transition">
+          <div class="grid grid-cols-2 gap-3 h-[350px] sm:h-[440px]">
+            <div class="rounded-2xl overflow-hidden relative"><img src="images/salchipapa.jpg" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" /><span class="absolute top-2.5 left-2.5 bg-black/75 backdrop-blur-md text-[11px] font-bold px-2.5 py-1 rounded-full text-amber-400">Top #1 Ventas</span></div>
+            <div class="rounded-2xl overflow-hidden relative"><img src="images/mojito.jpg" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" /><span class="absolute top-2.5 left-2.5 bg-black/75 backdrop-blur-md text-[11px] font-bold px-2.5 py-1 rounded-full text-white">Refrescante</span></div>
+            <div class="rounded-2xl overflow-hidden relative"><img src="images/pollo-broaster.jpg" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" /><span class="absolute bottom-2.5 left-2.5 bg-black/75 backdrop-blur-md text-[11px] font-bold px-2.5 py-1 rounded-full text-amber-300">85 Pts SCA</span></div>
+            <div class="rounded-2xl overflow-hidden relative"><img src="images/bar.jpg" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" /><span class="absolute bottom-2.5 right-2.5 bg-brand-pink text-white text-[11px] font-bold px-2.5 py-1 rounded-full">Nuevo</span></div>
+          </div>
+          <div class="pt-5 pb-2 px-2 flex items-center justify-between gap-4">
+            <div>
+              <h3 class="text-lg sm:text-xl font-extrabold font-display tracking-wide uppercase">EXPERIENCIA CAFÉ ENAMÓRATE</h3>
+              <p class="text-xs sm:text-sm text-zinc-400 mt-1">Personaliza tu bebida con leche de almendras, shots extra de espresso o helado artesanal.</p>
+            </div>
+          </div>
+        </div>
+        <div id="bentoProductsGrid" class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-5"></div>
+      </div>
+    </section>
+
+    <!-- CATEGORIAS -->
+    <section id="categorias" class="space-y-6 pt-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-2xl sm:text-4xl font-extrabold font-display tracking-tight uppercase">NUESTRAS CATEGORÍAS</h2>
+        <button onclick="filterCategory('Todos')" class="text-xs font-bold bg-white/10 hover:bg-white/20 px-4 py-2 rounded-full transition">Ver todas</button>
+      </div>
+      <div id="categoriesGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5"></div>
+    </section>
+
+    <!-- CATALOGO COMPLETO -->
+    <section id="catalogo-completo" class="space-y-6 pt-2">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-white/10 pb-4">
+        <div>
+          <h3 id="activeCategoryTitle" class="text-xl sm:text-2xl font-extrabold font-display">CARTA COMPLETA</h3>
+          <p class="text-xs text-zinc-400">Haz clic en <strong>Personalizar / +</strong> para elegir adicionales</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <select id="sortSelect" onchange="handleSortChange()" class="bg-[#121215] border border-white/15 rounded-full px-3.5 py-1.5 text-xs font-bold text-zinc-200 focus:outline-none focus:border-brand-pink">
+            <option value="featured">Ordenar: Destacados</option>
+            <option value="price-asc">Precio: Menor a Mayor</option>
+            <option value="price-desc">Precio: Mayor a Menor</option>
+          </select>
+        </div>
+      </div>
+      <div id="categoryPills" class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1"></div>
+      <div id="fullCatalogGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"></div>
+    </section>
+
+    <!-- BANNER RESERVA -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-5 pt-4">
+      <div class="lg:col-span-8 bg-[#121215] border border-white/[0.08] rounded-[26px] overflow-hidden relative min-h-[290px] flex items-center p-6 sm:p-10 group">
+        <img src="images/bar.jpg" class="absolute inset-0 w-full h-full object-cover opacity-45 group-hover:scale-105 transition duration-700" />
+        <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/65 to-black/85"></div>
+        <div class="relative z-10 w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+          <div class="max-w-lg space-y-2.5">
+            <span class="text-xs font-bold text-brand-pink uppercase tracking-widest">Reservas VIP & Eventos</span>
+            <h3 class="text-2xl sm:text-3xl font-extrabold font-display leading-tight">¿CITA ROMÁNTICA, CUMPLEAÑOS O ANIVERSARIO?</h3>
+            <p class="text-xs sm:text-sm text-zinc-300">Reserva tu mesa sin costo adicional y elige si deseas decoración especial.</p>
+          </div>
+          <button onclick="toggleReservationModal()" class="px-6 py-4 rounded-full bg-white text-black hover:bg-brand-pink hover:text-white font-extrabold text-xs sm:text-sm flex items-center gap-2 shrink-0 transition shadow-xl"><i data-lucide="calendar-check" class="w-4 h-4"></i><span>Reservar Ahora</span></button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="mt-20 border-t border-white/10 bg-[#060608] py-12">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-xs text-zinc-400">
+      <div class="space-y-3">
+        <div class="flex items-center gap-2 text-base font-extrabold text-white">
+          <span class="font-display">CAFÉ</span><span class="bg-brand-pink text-white px-1.5 py-0.5 rounded text-xs">♥</span><span class="font-display">ENAMÓRATE</span>
+        </div>
+        <p class="leading-relaxed">Cafetería de especialidad, repostería artesanal y restobar en Pichanaki, Chanchamayo.</p>
+      </div>
+      <div class="space-y-2.5">
+        <h4 class="text-white font-bold uppercase tracking-wider">Enlaces</h4>
+        <ul class="space-y-1.5">
+          <li><a href="#catalogo-completo" onclick="filterCategory('Todos')" class="hover:text-white">Ver Carta</a></li>
+          <li><a href="#" onclick="abrirReclamaciones()" class="hover:text-white">Libro de Reclamaciones</a></li>
+        </ul>
+      </div>
+      <div class="space-y-2.5">
+        <h4 class="text-white font-bold uppercase tracking-wider">Ubicación y Horario</h4>
+        <p>📍 Centro de Pichanaki, Chanchamayo - Junín</p>
+        <p>🕒 Lunes a Domingo: 4:00 PM – 1:00 AM</p>
+      </div>
+      <div class="space-y-2.5">
+        <h4 class="text-white font-bold uppercase tracking-wider">Atención</h4>
+        <p>📱 WhatsApp: +51 969 054 687</p>
+        <p>💳 Aceptamos Yape, Plin, Tarjetas POS y Efectivo</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- DOCK FLOTANTE -->
+  <div class="fixed bottom-5 left-1/2 -translate-x-1/2 z-40 flex items-center gap-1.5 sm:gap-2 bg-[#18181c]/95 backdrop-blur-xl border border-white/15 px-3 py-2 rounded-full shadow-2xl">
+    <a href="#categorias" class="flex items-center gap-1.5 bg-brand-pink hover:bg-rose-600 text-white text-xs font-extrabold px-4 py-2 rounded-full transition shadow-md"><i data-lucide="layout-grid" class="w-3.5 h-3.5"></i><span>Menú</span></a>
+    <button onclick="toggleCart()" class="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-3.5 py-2 rounded-full transition"><i data-lucide="shopping-cart" class="w-3.5 h-3.5 text-amber-400"></i><span id="dockCartCount">0</span></button>
+  </div>
+
+  <!-- ================= BOTÓN FLOTANTE DE INSTALACIÓN PWA ================= -->
+  <button id="btnInstalarApp" onclick="instalarApp()" class="fixed bottom-24 right-5 z-50 bg-brand-pink hover:bg-rose-600 text-white font-extrabold text-xs px-5 py-3.5 rounded-full shadow-2xl shadow-brand-pink/40 transition hidden items-center gap-2 border border-white/20">
+    <i data-lucide="download" class="w-4 h-4 animate-bounce"></i>
+    <span>Instalar App</span>
+  </button>
+
+  <!-- MODAL CUSTOMIZER -->
+  <div id="customizerModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+    <div onclick="closeCustomizer()" class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
+    <div id="customizerContent" class="relative z-10 w-full max-w-lg bg-[#121215] border border-white/15 rounded-[28px] overflow-hidden shadow-2xl animate-slide-up max-h-[90vh] flex flex-col"></div>
+  </div>
+
+  <!-- MODAL RESERVA -->
+  <div id="reservationModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+    <div onclick="toggleReservationModal()" class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
+    <div class="relative z-10 w-full max-w-md bg-[#121215] border border-white/15 rounded-[28px] p-6 space-y-4 shadow-2xl animate-slide-up">
+      <div class="flex items-center justify-between border-b border-white/10 pb-3">
+        <div class="flex items-center gap-2"><i data-lucide="calendar-heart" class="w-5 h-5 text-brand-pink"></i><h3 class="text-lg font-extrabold font-display">RESERVAR MESA</h3></div>
+        <button onclick="toggleReservationModal()" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      <div class="space-y-3 text-xs">
+        <div><label class="text-zinc-300 font-bold block mb-1">Nombre completo</label><input id="resName" type="text" placeholder="Ej. Juan Pérez" class="w-full bg-black/50 border border-white/10 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-brand-pink" /></div>
+        <div class="grid grid-cols-2 gap-2.5">
+          <div><label class="text-zinc-300 font-bold block mb-1">Fecha</label><input id="resDate" type="date" class="w-full bg-black/50 border border-white/10 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-brand-pink" /></div>
+          <div><label class="text-zinc-300 font-bold block mb-1">Hora</label><input id="resTime" type="time" value="19:30" class="w-full bg-black/50 border border-white/10 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-brand-pink" /></div>
+        </div>
+        <div class="grid grid-cols-2 gap-2.5">
+          <div><label class="text-zinc-300 font-bold block mb-1">Personas</label><select id="resGuests" class="w-full bg-black/50 border border-white/10 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-brand-pink"><option value="2 personas">2 personas</option><option value="3 a 4 personas">3 a 4 personas</option><option value="5 a 8 personas">5 a 8 personas</option><option value="+8 personas">+8 personas</option></select></div>
+          <div><label class="text-zinc-300 font-bold block mb-1">Zona</label><select id="resZone" class="w-full bg-black/50 border border-white/10 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-brand-pink"><option value="Salón">Salón</option><option value="Mesa VIP">Mesa VIP</option><option value="Terraza">Terraza</option></select></div>
+        </div>
+        <div><label class="text-zinc-300 font-bold block mb-1">Motivo (Opcional)</label><input id="resNotes" type="text" placeholder="Ej. Cumpleaños" class="w-full bg-black/50 border border-white/10 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-brand-pink" /></div>
+      </div>
+      <button onclick="sendReservationWhatsApp()" class="w-full bg-gradient-to-r from-brand-pink to-amber-500 hover:opacity-95 text-white font-extrabold py-3.5 rounded-full text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-brand-pink/30 transition"><i data-lucide="check-circle-2" class="w-4 h-4"></i> Confirmar Reserva</button>
+    </div>
+  </div>
+
+  <!-- MODAL RECLAMACIONES -->
+  <div id="modal-reclamaciones" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+    <div onclick="cerrarReclamaciones()" class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
+    <div class="relative z-10 w-full max-w-md bg-[#121215] border border-white/15 rounded-[28px] p-6 space-y-4 shadow-2xl animate-slide-up">
+      <div class="flex items-center justify-between border-b border-white/10 pb-3">
+        <div class="flex items-center gap-2"><i data-lucide="file-warning" class="w-5 h-5 text-brand-pink"></i><h3 class="text-lg font-extrabold font-display">LIBRO DE RECLAMACIONES</h3></div>
+        <button onclick="cerrarReclamaciones()" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      <form onsubmit="enviarReclamacion(event)" class="space-y-3 text-xs">
+        <div><label class="text-zinc-300 font-bold block mb-1">Nombre Completo</label><input type="text" required class="w-full bg-black/50 border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-brand-pink" /></div>
+        <div><label class="text-zinc-300 font-bold block mb-1">DNI / RUC</label><input type="text" required class="w-full bg-black/50 border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-brand-pink" /></div>
+        <div><label class="text-zinc-300 font-bold block mb-1">Correo Electrónico</label><input type="email" required class="w-full bg-black/50 border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-brand-pink" /></div>
+        <div><label class="text-zinc-300 font-bold block mb-1">Tipo</label><select class="w-full bg-black/50 border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-brand-pink"><option>Reclamo</option><option>Queja</option></select></div>
+        <div><label class="text-zinc-300 font-bold block mb-1">Detalle</label><textarea rows="3" required class="w-full bg-black/50 border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-brand-pink"></textarea></div>
+        <button type="submit" class="w-full bg-brand-pink hover:bg-rose-600 text-white font-extrabold py-3 rounded-full transition">Enviar Reclamo</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- CARRITO DRAWER -->
+  <div id="cartModal" class="fixed inset-0 z-50 hidden">
+    <div onclick="toggleCart()" class="absolute inset-0 bg-black/75 backdrop-blur-sm"></div>
+    <div class="absolute right-0 top-0 bottom-0 w-full max-w-md bg-[#121215] border-l border-white/10 p-5 flex flex-col justify-between z-10 overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-white/10 pb-3">
+        <div class="flex items-center gap-2"><i data-lucide="shopping-bag" class="w-5 h-5 text-brand-pink"></i><h3 class="text-base sm:text-lg font-extrabold font-display">TU PEDIDO</h3></div>
+        <button onclick="toggleCart()" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      <div id="cartItemsContainer" class="flex-1 overflow-y-auto py-3 space-y-2.5 min-h-[160px] max-h-[270px]"></div>
+      <div class="border-t border-white/10 pt-3 space-y-3 text-xs">
+        <div class="flex gap-2">
+          <input id="couponInput" type="text" placeholder="Código promo (ENAMORATE10)" class="flex-1 bg-black/50 border border-white/10 rounded-xl px-3 py-2 text-white uppercase focus:outline-none focus:border-brand-pink" />
+          <button onclick="applyCoupon()" class="bg-white/10 hover:bg-white/20 text-white font-bold px-3.5 py-2 rounded-xl transition">Aplicar</button>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <input id="customerName" type="text" placeholder="Tu nombre" class="bg-black/50 border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-brand-pink" />
+          <select id="orderType" onchange="updateCartUI()" class="bg-black/50 border border-white/10 rounded-xl px-2.5 py-2 text-white focus:outline-none focus:border-brand-pink">
+            <option value="salon" data-fee="0">☕ Consumo en Salón (S/ 0)</option>
+            <option value="recojo" data-fee="0">🏪 Recoger en Local (S/ 0)</option>
+            <option value="centro" data-fee="5">🛵 Delivery Pichanaki (+S/ 5)</option>
+          </select>
+        </div>
+        <input id="customerAddress" type="text" placeholder="Dirección exacta o N° de Mesa" class="w-full bg-black/50 border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-brand-pink" />
+        
+        <div>
+          <label class="text-zinc-400 font-semibold block mb-1.5">Método de Pago:</label>
+          <div class="grid grid-cols-3 gap-2">
+            <button type="button" onclick="selectPaymentMethod('Yape / Plin')" id="payBtnYape" class="py-2 px-2 rounded-xl border border-brand-pink bg-brand-pink/15 text-white font-bold flex items-center justify-center gap-1"><i data-lucide="qr-code" class="w-3.5 h-3.5 text-amber-400"></i> Yape</button>
+            <button type="button" onclick="selectPaymentMethod('Tarjeta POS')" id="payBtnCard" class="py-2 px-2 rounded-xl border border-white/10 bg-black/40 text-zinc-300 font-bold flex items-center justify-center gap-1"><i data-lucide="credit-card" class="w-3.5 h-3.5"></i> Tarjeta</button>
+            <button type="button" onclick="selectPaymentMethod('Efectivo')" id="payBtnCash" class="py-2 px-2 rounded-xl border border-white/10 bg-black/40 text-zinc-300 font-bold flex items-center justify-center gap-1"><i data-lucide="banknote" class="w-3.5 h-3.5"></i> Efectivo</button>
+          </div>
+        </div>
+
+        <div id="yapeQrBox" class="bg-gradient-to-br from-purple-950/60 to-black border border-purple-500/30 rounded-2xl p-3 flex items-center gap-3">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=Yape-CafeEnamorate-969054687" alt="QR Yape" class="w-16 h-16 rounded-lg bg-white p-1 shrink-0" />
+          <div class="space-y-1 flex-1">
+            <div class="flex items-center justify-between"><span class="font-extrabold text-purple-300 uppercase text-[10px]">Yape / Plin Oficial</span><button onclick="copyYapeNumber()" class="text-[10px] bg-purple-600 hover:bg-purple-500 text-white font-bold px-2 py-0.5 rounded-full transition">Copiar N°</button></div>
+            <p class="text-white font-extrabold text-sm">969 054 687</p>
+            <p class="text-[10px] text-zinc-400">Titular: Café Enamorate (Envía captura)</p>
+          </div>
+        </div>
+
+        <div class="bg-black/40 rounded-2xl p-3 space-y-1 border border-white/[0.06]">
+          <div class="flex justify-between text-zinc-400"><span>Subtotal:</span><span id="summarySubtotal">S/ 0.00</span></div>
+          <div class="flex justify-between text-emerald-400" id="summaryDiscountRow" style="display:none;"><span>Descuento:</span><span id="summaryDiscount">- S/ 0.00</span></div>
+          <div class="flex justify-between text-zinc-400"><span>Envío:</span><span id="summaryDelivery">S/ 0.00</span></div>
+          <div class="flex justify-between text-sm font-extrabold text-white pt-1 border-t border-white/10"><span>Total:</span><span id="drawerCartTotal" class="text-lg text-amber-400">S/ 0.00</span></div>
+        </div>
+
+        <button onclick="procesarPago(event)" class="w-full bg-gradient-to-r from-brand-pink to-orange-500 hover:opacity-95 text-white font-extrabold py-3.5 rounded-full text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-brand-pink/30 transition"><i data-lucide="send" class="w-4 h-4"></i> Enviar Pedido por WhatsApp</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/app.js"></script>
+
+  <!-- ================= SCRIPT DE INSTALACIÓN PWA ================= -->
+  <script>
+    let deferredPrompt;
+
+    // 1. Detectar si el navegador permite la instalación
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        const btn = document.getElementById('btnInstalarApp');
+        btn.classList.remove('hidden');
+        btn.classList.add('flex');
+    });
+
+    // 2. Función para mostrar el diálogo de instalación
+    function instalarApp() {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('Usuario instaló la app');
+                    document.getElementById('btnInstalarApp').classList.add('hidden');
+                }
+                deferredPrompt = null;
+            });
+        } else {
+            alert("Para instalar la app en tu celular:\n\n📱 iPhone/iPad: Toca 'Compartir' y luego 'Agregar a pantalla de inicio'.\n🤖 Android: Toca los 3 puntos y selecciona 'Instalar aplicación'.");
+        }
+    }
+
+    // 3. Registrar el Service Worker
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js')
+            .then(() => console.log('Service Worker registrado exitosamente'))
+            .catch((err) => console.error('Error al registrar SW:', err));
+    }
+
+    // 4. Ocultar botón si ya está instalada
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+        document.getElementById('btnInstalarApp').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>
