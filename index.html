@@ -14,12 +14,12 @@
   <meta property="og:description" content="El rincón perfecto para compartir. Pide online y recoge en tienda.">
   <meta property="og:image" content="https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=1000&auto=format&fit=crop">
 
-  <!-- ================= CONFIGURACIÓN PWA ================= -->
-  <link rel="manifest" href="/manifest.json">
+  <!-- ================= CONFIGURACIÓN PWA (CORREGIDO) ================= -->
+  <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#e11d48">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <!-- ===================================================== -->
+  <!-- ================================================================= -->
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -361,11 +361,10 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/app.js"></script>
 
-  <!-- ================= SCRIPT DE INSTALACIÓN PWA ================= -->
+  <!-- ================= SCRIPT DE INSTALACIÓN PWA (CORREGIDO) ================= -->
   <script>
     let deferredPrompt;
 
-    // 1. Detectar si el navegador permite la instalación
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
@@ -374,7 +373,6 @@
         btn.classList.add('flex');
     });
 
-    // 2. Función para mostrar el diálogo de instalación
     function instalarApp() {
         if (deferredPrompt) {
             deferredPrompt.prompt();
@@ -390,14 +388,13 @@
         }
     }
 
-    // 3. Registrar el Service Worker
+    // ESTA ES LA LÍNEA CORREGIDA (antes decía /sw.js)
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js')
+        navigator.serviceWorker.register('./sw.js')
             .then(() => console.log('Service Worker registrado exitosamente'))
             .catch((err) => console.error('Error al registrar SW:', err));
     }
 
-    // 4. Ocultar botón si ya está instalada
     if (window.matchMedia('(display-mode: standalone)').matches) {
         document.getElementById('btnInstalarApp').classList.add('hidden');
     }
