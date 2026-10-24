@@ -14,12 +14,12 @@
   <meta property="og:description" content="El rincón perfecto para compartir. Pide online y recoge en tienda.">
   <meta property="og:image" content="https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=1000&auto=format&fit=crop">
 
-  <!-- ================= CONFIGURACIÓN PWA (CORREGIDO) ================= -->
+  <!-- ================= CONFIGURACIÓN PWA (RUTAS CORREGIDAS) ================= -->
   <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#e11d48">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <!-- ================================================================= -->
+  <!-- ======================================================================= -->
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -63,6 +63,47 @@
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     .animate-slide-up { animation: slideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+    /* ================= PARCHE MÓVIL (APP FEEL) ================= */
+    @media (max-width: 768px) {
+      /* Header compacto */
+      header .h-20 { height: 60px; }
+      header .text-xl { font-size: 1.1rem; }
+      header .px-4 { padding-left: 0.5rem; padding-right: 0.5rem; }
+      #estado-tienda-header { display: none !important; }
+      
+      /* Carrito en header */
+      #headerCartTotal { display: none; }
+      #headerCartCount { width: 1.25rem; height: 1.25rem; font-size: 0.65rem; }
+      
+      /* Hero Slider */
+      #heroSlideContent { padding: 20px 15px; gap: 15px; }
+      #heroSlideContent h1 { font-size: 1.8rem !important; line-height: 1.1; }
+      #heroSlideContent p { font-size: 0.85rem; }
+      #heroSlideContent .pt-2 { justify-content: center; }
+      #heroSlideContent button { font-size: 0.75rem; padding: 10px 15px; }
+      #heroSlideContent .w-64 { width: 180px; height: 180px; }
+      #populares .h-\[350px\] { height: 250px; }
+
+      /* Beneficios (2x2) */
+      main > section:nth-child(2) { grid-template-columns: 1fr 1fr; }
+      main > section:nth-child(2) div { padding: 10px; flex-direction: column; text-align: center; gap: 5px; }
+      main > section:nth-child(2) span { font-size: 0.7rem; }
+
+      /* Modales (Carrito full-screen) */
+      #cartModal .absolute.right-0 { width: 100%; max-width: 100%; border-left: none; }
+      #cartItemsContainer { max-height: 200px; }
+      #btnInstalarApp { bottom: 85px !important; right: 15px !important; padding: 10px 15px; font-size: 0.75rem; }
+
+      /* Tarjetas de producto */
+      .card-glow { padding: 8px; }
+      .card-glow .h-48 { height: 140px; }
+      .card-glow h4 { font-size: 0.85rem; }
+      .card-glow .card-btn-ver { font-size: 0.7rem; padding: 6px 10px; }
+      
+      /* Footer padding */
+      footer { padding-top: 2rem; padding-bottom: 2rem; }
+    }
   </style>
 </head>
 <body class="antialiased selection:bg-brand-pink selection:text-white pb-28">
@@ -361,7 +402,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/app.js"></script>
 
-  <!-- ================= SCRIPT DE INSTALACIÓN PWA (CORREGIDO) ================= -->
+  <!-- ================= SCRIPT DE INSTALACIÓN PWA ================= -->
   <script>
     let deferredPrompt;
 
@@ -388,7 +429,7 @@
         }
     }
 
-    // ESTA ES LA LÍNEA CORREGIDA (antes decía /sw.js)
+    // RUTA CORREGIDA PARA GITHUB PAGES
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./sw.js')
             .then(() => console.log('Service Worker registrado exitosamente'))
